@@ -20,7 +20,7 @@ void mw_context_init(MwContext* ctx) {
 }   
 
 void mw_context_clean(MwContext* ctx) {
-    EVP_CIPHER_CTX_free(ctx->cipher_ctx);
+    if (ctx->cipher_ctx) EVP_CIPHER_CTX_free(ctx->cipher_ctx);
 
     ctx->root_widget = 0;
     ctx->key_input_field = 0;

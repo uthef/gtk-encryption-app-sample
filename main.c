@@ -5,13 +5,14 @@
 #include <gtk/gtk.h>
 
 void on_app_activated(GtkApplication*, MwContext*);
+void add_css_styles();
 int main(int, char**);
 
 int main(int argc, char** argv) {
     MwContext ctx;
 
     GtkApplication* app = gtk_application_new(
-        "com.uthef.encryptor_gui", 
+        "com.uthef.gtk-encryption-app-sample", 
         G_APPLICATION_DEFAULT_FLAGS
     );
 
@@ -24,8 +25,25 @@ int main(int argc, char** argv) {
 }
 
 void on_app_activated(GtkApplication* app, MwContext* ctx) {
-    GtkWidget* main_window = gtk_application_window_new(app);
+    mw_context_init(ctx);
 
+    GtkWidget* main_window = gtk_application_window_new(app);
+    GtkWidget* root_widget = mw_context_get_root(ctx);
+
+    gtk_window_set_title(GTK_WINDOW(main_window), "GTK Encryption App Sample");
+
+    if (!root_widget) {
+        g_error("window layout initialization failure");
+        return;
+    }
+
+    add_css_styles();
+    
+    gtk_window_set_child(GTK_WINDOW(main_window), root_widget);
+    gtk_window_present(GTK_WINDOW(main_window));
+}
+
+void add_css_styles() {
     GtkCssProvider* css_provider = gtk_css_provider_new();
     gtk_css_provider_load_from_string(css_provider, MAIN_STYLESHEET);
 
@@ -34,15 +52,4 @@ void on_app_activated(GtkApplication* app, MwContext* ctx) {
         GTK_STYLE_PROVIDER(css_provider), 
         GTK_STYLE_PROVIDER_PRIORITY_USER
     );
-
-    mw_context_init(ctx);
-    GtkWidget* root_widget = mw_context_get_root(ctx);
-
-    if (!root_widget) {
-        g_error("window layout initialization failure");
-        return;
-    }
-
-    gtk_window_set_child(GTK_WINDOW(main_window), root_widget);
-    gtk_window_present(GTK_WINDOW(main_window));
 }
