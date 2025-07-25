@@ -1,5 +1,5 @@
 #include "mw_context.h"
-#include "design/css_styles.h"
+#include "design/css_data.h"
 #include "glib-object.h"
 #include "gtk/gtk.h"
 #include "gtk/gtkshortcut.h"

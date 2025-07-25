@@ -1,7 +1,7 @@
 #include "glib.h"
 #include "gtk/gtkcssprovider.h"
 #include "main_window/mw_context.h"
-#include "design/css_styles.h"
+#include "design/css_data.h"
 #include <gtk/gtk.h>
 
 void on_app_activated(GtkApplication*, MwContext*);
