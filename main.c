@@ -5,7 +5,7 @@
 #include <gtk/gtk.h>
 
 void on_app_activated(GtkApplication*, MwContext*);
-void add_css_styles();
+void add_css();
 int main(int, char**);
 
 int main(int argc, char** argv) {
@@ -37,13 +37,13 @@ void on_app_activated(GtkApplication* app, MwContext* ctx) {
         return;
     }
 
-    add_css_styles();
-    
+    add_css();
+
     gtk_window_set_child(GTK_WINDOW(main_window), root_widget);
     gtk_window_present(GTK_WINDOW(main_window));
 }
 
-void add_css_styles() {
+void add_css() {
     GtkCssProvider* css_provider = gtk_css_provider_new();
     gtk_css_provider_load_from_string(css_provider, MAIN_STYLESHEET);
 
