@@ -1,7 +1,7 @@
 #include "input_transformer.h"
-#include "css_styles.h"
+#include "design/css_styles.h"
 #include "gtk/gtk.h"
-#include "hexparse.h"
+#include "utils/hexparse.h"
 
 static const char* INVALID_KEY_ERROR = "Invalid key";
 static const char* INVALID_IV_ERROR = "Invalid initialization vector";

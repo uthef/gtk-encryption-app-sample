@@ -8,11 +8,11 @@ pkg_check_modules(GTK4 REQUIRED gtk4)
 
 set(SOURCE_LIST 
     main.c
-    gtk_helpers.c
-    hexparse.c
-    mw_context.c
-    mw_actions.c
-    input_transformer.c
+    utils/gtk_helpers.c
+    utils/hexparse.c
+    main_window/mw_context.c
+    main_window/mw_actions.c
+    main_window/input_transformer.c
 )
 
 if (WIN32 AND NOT ${CMAKE_BUILD_TYPE} STREQUAL "Debug")
@@ -21,7 +21,8 @@ else()
     add_executable(${PROJECT_NAME} ${SOURCE_LIST})
 endif()
 
-target_include_directories(${PROJECT_NAME} PRIVATE 
+target_include_directories(${PROJECT_NAME} PRIVATE
+    ${CMAKE_SOURCE_DIR}
     ${GTK4_INCLUDE_DIRS}
 )
 

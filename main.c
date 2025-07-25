@@ -1,10 +1,10 @@
 #include "glib.h"
 #include "gtk/gtkcssprovider.h"
-#include "mw_context.h"
-#include "css_styles.h"
+#include "main_window/mw_context.h"
+#include "design/css_styles.h"
 #include <gtk/gtk.h>
 
-void activate(GtkApplication*, MwContext*);
+void on_app_activated(GtkApplication*, MwContext*);
 int main(int, char**);
 
 int main(int argc, char** argv) {
@@ -15,7 +15,7 @@ int main(int argc, char** argv) {
         G_APPLICATION_DEFAULT_FLAGS
     );
 
-    g_signal_connect(app, "activate", G_CALLBACK(activate), &ctx);
+    g_signal_connect(app, "activate", G_CALLBACK(on_app_activated), &ctx);
 
     int exit_code = g_application_run(G_APPLICATION(app), argc, argv);
     mw_context_clean(&ctx);
@@ -23,7 +23,7 @@ int main(int argc, char** argv) {
     return exit_code;
 }
 
-void activate(GtkApplication* app, MwContext* ctx) {
+void on_app_activated(GtkApplication* app, MwContext* ctx) {
     GtkWidget* main_window = gtk_application_window_new(app);
 
     GtkCssProvider* css_provider = gtk_css_provider_new();

@@ -1,10 +1,10 @@
 #include "mw_context.h"
-#include "css_styles.h"
+#include "design/css_styles.h"
 #include "glib-object.h"
 #include "gtk/gtk.h"
 #include "gtk/gtkshortcut.h"
 #include "mw_actions.h"
-#include "gtk_helpers.h"
+#include "utils/gtk_helpers.h"
 
 void mw_context_init_layout(MwContext*);
 void mw_context_connect_signals(MwContext*);
@@ -121,6 +121,6 @@ void mw_context_connect_signals(MwContext* ctx) {
 
     g_signal_connect(ctx->enc_mode_check, "toggled", G_CALLBACK(on_mode_changed), ctx);
 
-    g_signal_connect(text_field_buffer, "changed", G_CALLBACK(on_text_field_change), ctx);
-    g_signal_connect(hex_field_buffer, "changed", G_CALLBACK(on_hex_field_change), ctx);
+    g_signal_connect(text_field_buffer, "changed", G_CALLBACK(on_text_field_changed), ctx);
+    g_signal_connect(hex_field_buffer, "changed", G_CALLBACK(on_hex_field_changed), ctx);
 }

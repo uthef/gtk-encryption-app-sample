@@ -4,7 +4,7 @@
 #include "mw_context.h"
 #include "openssl/rand.h"
 #include <openssl/evp.h>
-#include "hexparse.h"
+#include "utils/hexparse.h"
 
 void gen_buffer_data(GtkEntryBuffer* entry_buffer, size_t len) {
     unsigned char raw_buffer[len];
@@ -16,13 +16,13 @@ void gen_buffer_data(GtkEntryBuffer* entry_buffer, size_t len) {
     gtk_entry_buffer_set_text(entry_buffer, hex_buffer, len * 2);
 }
 
-void on_text_field_change(GtkTextBuffer* buffer, MwContext* ctx) {
+void on_text_field_changed(GtkTextBuffer* buffer, MwContext* ctx) {
     if (!get_mode(ctx)) return;
 
     transform_input(ctx);
 }
 
-void on_hex_field_change(GtkTextBuffer* buffer, MwContext* ctx) {
+void on_hex_field_changed(GtkTextBuffer* buffer, MwContext* ctx) {
     if (get_mode(ctx)) return;
 
     transform_input(ctx);

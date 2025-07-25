@@ -4,8 +4,8 @@
 #include "mw_context.h"
 #include <gtk/gtk.h>
 
-void on_text_field_change(GtkTextBuffer* buffer, MwContext* ctx);
-void on_hex_field_change(GtkTextBuffer* buffer, MwContext* ctx);
+void on_text_field_changed(GtkTextBuffer* buffer, MwContext* ctx);
+void on_hex_field_changed(GtkTextBuffer* buffer, MwContext* ctx);
 void on_key_changed(GtkEntry* entry, MwContext* ctx);
 void on_iv_changed(GtkEntry* entry, MwContext* ctx);
 void on_gen_key_button_clicked(GtkButton* button, MwContext* ctx);
