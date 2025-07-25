@@ -1,5 +1,5 @@
-#ifndef CSS_STYLES_H
-#define CSS_STYLES_H
+#ifndef CSS_DATA_H
+#define CSS_DATA_H
 
 static const char* CLASS_DEFAULT_TEXT_VIEW = "default-text-view";
 
