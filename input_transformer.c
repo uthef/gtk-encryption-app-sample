@@ -3,6 +3,10 @@
 #include "gtk/gtk.h"
 #include "hexparse.h"
 
+static const char* INVALID_KEY_ERROR = "Invalid key";
+static const char* INVALID_IV_ERROR = "Invalid initialization vector";
+static const char* INVALID_BOTH_ERROR = "Invalid key and initialization vector";
+
 int check_context(MwContext* ctx) {
     if (!ctx->cipher_ctx) {
         g_warning("cryptographical context is not initialized");
@@ -34,10 +38,36 @@ void clear_buffer(GtkTextBuffer* text_buffer) {
     gtk_text_buffer_set_text(text_buffer, "", 0);
 }
 
+int parse_key_and_iv(MwContext* ctx, unsigned char* key_buff, int key_len, unsigned char* iv_buff, int iv_len, const char** err) {
+    GtkEntryBuffer* key_entry_buffer = gtk_entry_get_buffer(GTK_ENTRY(ctx->key_input_field));
+    GtkEntryBuffer* iv_entry_buffer = gtk_entry_get_buffer(GTK_ENTRY(ctx->iv_input_field));
+    const char* key_hex_data =  gtk_entry_buffer_get_text(key_entry_buffer);
+    const char* iv_hex_data =  gtk_entry_buffer_get_text(iv_entry_buffer);
+    int flags = 0;
+
+    if (parse_hex_data(key_hex_data, key_buff, key_len, 0)) flags |= 1;
+    if (parse_hex_data(iv_hex_data, iv_buff, iv_len, 0)) flags |= 2;
+
+    if (flags == 0) {
+        *err = INVALID_BOTH_ERROR;
+        return 0;
+    }
+    else if ((flags & 1) != 1) {
+        *err = INVALID_KEY_ERROR;
+        return 0;
+    }
+    else if ((flags & 2) != 2) {
+        *err = INVALID_IV_ERROR;
+        return 0;
+    }
+
+    return 1;
+}
+
 void transform_input(MwContext* ctx) {
     if (!check_context(ctx)) return;
 
-    int key_len = 128 / 8, iv_len = 128 / 8;
+    int key_len = 128 / 8, iv_len = 128 / 8, block_size = 128 / 8;
     int mode = get_mode(ctx);
 
     GtkTextBuffer* output_buffer = gtk_text_view_get_buffer(
@@ -48,24 +78,13 @@ void transform_input(MwContext* ctx) {
     gtk_text_view_set_editable(GTK_TEXT_VIEW(ctx->hex_field), mode == 0);
 
     unsigned char key_buff[key_len], iv_buff[iv_len];
+    const char* err = 0;
 
-    GtkEntryBuffer* key_entry_buffer = gtk_entry_get_buffer(GTK_ENTRY(ctx->key_input_field));
-    const char* key_hex_data =  gtk_entry_buffer_get_text(key_entry_buffer);
-
-    if (!parse_hex_data(key_hex_data, key_buff, key_len, 0)) {
+    if (!parse_key_and_iv(ctx, key_buff, key_len, iv_buff, iv_len, &err)) {
         clear_buffer(output_buffer);
-        display_error(ctx, "Invalid key");
-        g_warning("key parsing error\n");
-        return;
-    } 
+        display_error(ctx, err);
+        g_warning("%s\n", err);
 
-    GtkEntryBuffer* iv_entry_buffer = gtk_entry_get_buffer(GTK_ENTRY(ctx->iv_input_field));
-    const char* iv_hex_data =  gtk_entry_buffer_get_text(iv_entry_buffer);
-
-    if (!parse_hex_data(iv_hex_data, iv_buff, iv_len, 0)) {
-        clear_buffer(output_buffer);
-        display_error(ctx, "Invalid IV");
-        g_warning("IV parsing error\n");
         return;
     }
 
@@ -94,7 +113,7 @@ void transform_input(MwContext* ctx) {
 
     unsigned char dehex[inl / 2];
     unsigned char* in_raw = mode ? (unsigned char*)in_text : dehex;
-    unsigned char out_raw[mode ? (inl + key_len) : (inl / 2)];
+    unsigned char out_raw[mode ? (inl + block_size) : (inl / 2)];
 
     int outl = 0, total_out_len = 0, result = 1;
     int hex_out_len = 0;
