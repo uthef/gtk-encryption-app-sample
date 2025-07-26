@@ -15,14 +15,18 @@ GtkWidget* mw_context_get_root(MwContext* ctx) {
 
 void mw_context_init(MwContext* ctx) {
     ctx->cipher_ctx = EVP_CIPHER_CTX_new();
+    ctx->timer = g_timer_new();
+    
     mw_context_init_layout(ctx);
     mw_context_connect_signals(ctx);
 }   
 
 void mw_context_clean(MwContext* ctx) {
     if (ctx->cipher_ctx) EVP_CIPHER_CTX_free(ctx->cipher_ctx);
+    if (ctx->timer) g_timer_destroy(ctx->timer);
 
     ctx->root_widget = 0;
+    ctx->timer = 0;
     ctx->key_input_field = 0;
     ctx->gen_key_button = 0;
     ctx->iv_input_field = 0;
@@ -94,13 +98,20 @@ void mw_context_init_layout(MwContext* ctx) {
     gtk_widget_add_css_class(ctx->error_label, CLASS_ERROR);
     gtk_widget_add_css_class(ctx->error_label, CLASS_INVIS);
 
+    // Status bar
+    GtkWidget* status_bar = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, margin);
+    ctx->status_bar_label = gtk_label_new_aligned("", GTK_ALIGN_START);
+    gtk_box_append(GTK_BOX(status_bar), ctx->status_bar_label);
+    gtk_widget_add_css_class(status_bar, CLASS_STATUS_BAR);
+
     // Composition
-    gtk_box_append_n(root, 8, 
+    gtk_box_append_n(root, 9, 
         key_hbox, iv_hbox,
         mode_hbox,
         text_field_label, text_field_window,
         hex_field_label, hex_field_window,
-        ctx->error_label
+        ctx->error_label,
+        status_bar
     );
 }
 

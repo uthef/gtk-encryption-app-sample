@@ -14,7 +14,7 @@ int is_valid_hex_char(char c) {
     return (c >= 'a' && c <= 'f') || (c >= '0' && c <= '9') || (c >= 'A' && c <= 'F');
 }
 
-int parse_hex_data(const char* hex_data, unsigned char* raw_buffer, int exp_len, int* out_len) {
+int parse_hex_data(const char* hex_data, unsigned char* raw_buffer, int exp_len, size_t* out_len) {
     const char* ptr = hex_data;
     int idx = 0;
 

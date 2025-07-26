@@ -24,6 +24,11 @@ struct MwContext {
     GtkWidget* hex_field;
 
     GtkWidget* error_label;
+
+    GtkWidget* status_bar_label;
+
+    GTimer* timer;
+    
 };
 
 GtkWidget* mw_context_get_root(MwContext*);

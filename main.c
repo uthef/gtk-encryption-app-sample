@@ -10,6 +10,8 @@ int main(int, char**);
 
 int main(int argc, char** argv) {
     MwContext ctx;
+    ctx.timer = 0;
+    ctx.cipher_ctx = 0;
 
     GtkApplication* app = gtk_application_new(
         "com.uthef.gtk-encryption-app-sample", 
@@ -20,6 +22,7 @@ int main(int argc, char** argv) {
 
     int exit_code = g_application_run(G_APPLICATION(app), argc, argv);
     mw_context_clean(&ctx);
+    g_object_unref(app);
 
     return exit_code;
 }

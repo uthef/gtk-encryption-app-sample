@@ -3,10 +3,11 @@
 
 #include "mw_context.h"
 
-void transform_input(MwContext* ctx);
-int get_mode(MwContext* ctx);
-void clear_buffer(GtkTextBuffer* text_buffer);
-void display_error(MwContext* ctx, const char* msg);
-int check_context(MwContext* ctx);
+static const char* INVALID_KEY_ERROR = "Invalid key";
+static const char* INVALID_IV_ERROR = "Invalid initialization vector";
+static const char* INVALID_BOTH_ERROR = "Invalid key and initialization vector";
+
+int parse_key_and_iv(MwContext* ctx, unsigned char* key_buff, int key_len, unsigned char* iv_buff, int iv_len, const char** err);
+void transform_input(MwContext* ctx, size_t* in_len, size_t* out_len);
 
 #endif

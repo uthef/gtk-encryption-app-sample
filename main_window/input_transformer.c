@@ -1,42 +1,8 @@
 #include "input_transformer.h"
 #include "design/css_data.h"
 #include "gtk/gtk.h"
+#include "mw_actions.h"
 #include "utils/hexparse.h"
-
-static const char* INVALID_KEY_ERROR = "Invalid key";
-static const char* INVALID_IV_ERROR = "Invalid initialization vector";
-static const char* INVALID_BOTH_ERROR = "Invalid key and initialization vector";
-
-int check_context(MwContext* ctx) {
-    if (!ctx->cipher_ctx) {
-        g_warning("cryptographical context is not initialized");
-        return 0;
-    }
-
-    return 1;
-}
-
-int get_mode(MwContext* ctx) {
-    return gtk_check_button_get_active(GTK_CHECK_BUTTON(ctx->enc_mode_check));
-}
-
-void display_error(MwContext* ctx, const char* msg) {
-    if (!msg) {
-        gtk_widget_remove_css_class(ctx->error_label, CLASS_VIS);
-        gtk_widget_add_css_class(ctx->error_label, CLASS_INVIS);
-        return;
-    }
-
-    gtk_label_set_text(GTK_LABEL(ctx->error_label), msg);
-
-
-    gtk_widget_remove_css_class(ctx->error_label, CLASS_INVIS);
-    gtk_widget_add_css_class(ctx->error_label, CLASS_VIS);
-}
-
-void clear_buffer(GtkTextBuffer* text_buffer) {
-    gtk_text_buffer_set_text(text_buffer, "", 0);
-}
 
 int parse_key_and_iv(MwContext* ctx, unsigned char* key_buff, int key_len, unsigned char* iv_buff, int iv_len, const char** err) {
     GtkEntryBuffer* key_entry_buffer = gtk_entry_get_buffer(GTK_ENTRY(ctx->key_input_field));
@@ -64,7 +30,7 @@ int parse_key_and_iv(MwContext* ctx, unsigned char* key_buff, int key_len, unsig
     return 1;
 }
 
-void transform_input(MwContext* ctx) {
+void transform_input(MwContext* ctx, size_t* in_len, size_t* out_len) {
     if (!check_context(ctx)) return;
 
     int key_len = 128 / 8, iv_len = 128 / 8, block_size = 128 / 8;
@@ -103,7 +69,7 @@ void transform_input(MwContext* ctx) {
         TRUE
     );
 
-    int inl = strlen(in_text);
+    size_t inl = strlen(in_text);
 
     if (inl == 0) {
         clear_buffer(output_buffer);
@@ -116,7 +82,7 @@ void transform_input(MwContext* ctx) {
     unsigned char out_raw[mode ? (inl + block_size) : (inl / 2)];
 
     int outl = 0, total_out_len = 0, result = 1;
-    int hex_out_len = 0;
+    size_t hex_out_len = 0;
 
     if (!mode) {
         if (!parse_hex_data(in_text, dehex, -1, &hex_out_len)) {
@@ -126,6 +92,8 @@ void transform_input(MwContext* ctx) {
             return;
         }
     }
+
+    if (in_len) *in_len = mode ? inl : hex_out_len;
 
     result &= EVP_CipherInit(ctx->cipher_ctx, EVP_aes_128_cbc(), key_buff, iv_buff, mode);
 
@@ -156,4 +124,5 @@ void transform_input(MwContext* ctx) {
     }
 
     display_error(ctx, 0);
+    if (out_len) *out_len = total_out_len;
 }
